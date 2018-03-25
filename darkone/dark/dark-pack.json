@@ -1,0 +1,74 @@
+{
+    "remotePath": "http://192.168.2.11:5555",
+    "files": [
+        {
+            "namespace": "one.bat",
+            "path": "./one.bat",
+            "version": "1.0.0",
+            "template": {
+                "port": "set port_num=00"
+            }
+        },
+        {
+            "namespace": "one.sh",
+            "path": "./one.sh",
+            "version": "1.0.0",
+            "template": {
+                "port": "port_num=\"00\""
+            }
+        },
+        {
+            "namespace": "server.xml",
+            "path": "./server.xml",
+            "version": "1.0.0",
+            "template": {
+                "port_num": "00",
+                "doc_base": "$D{bb}/WebRoot"
+            }
+        },
+        {
+            "namespace": "readme.md",
+            "path": "./readme.md",
+            "version": "1.0.0"
+        },
+        {
+            "namespace": "dark",
+            "suffix": "/",
+            "path": "./dark",
+            "version": "1.0.0"
+        },
+        {
+            "namespace": "dark.exe",
+            "suffix": "/",
+            "path": "./dark.exe",
+            "version": "1.0.0"
+        }
+    ],
+    "commands-w": {
+        "init": "one.bat init",
+        "gitpull": "one.bat gitpull",
+        "yarn": "one.bat yarn",
+        "clean": "one.bat clean",
+        "dev": "one.bat dev",
+        "prod": "one.bat prod",
+        "mvn": "one.bat mvn",
+        "start": "one.bat start $D{e}",
+        "stop": "one.bat stop",
+        "pack": "one.bat prod mvn",
+        "all": "one.bat yarn prod mvn"
+    },
+    "commands-m": {
+        "init": "bash one.sh init",
+        "gitpull": "bash one.sh gitpull",
+        "yarn": "bash one.sh yarn",
+        "clean": "bash one.sh clean",
+        "dev": "bash one.sh dev",
+        "prod": "bash one.sh prod",
+        "mvn": "bash one.sh mvn",
+        "start": "bash one.sh start $D{e}",
+        "stop": "bash one.sh stop",
+        "log": "bash one.sh log",
+        "pack": "bash one.sh prod mvn",
+        "all": "bash one.sh yarn prod mvn"
+    }
+}

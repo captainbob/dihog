@@ -1,0 +1,208 @@
+chcp 65001
+@echo off 
+setlocal
+
+set opt_config=default
+set opt_mvn=n
+set opt_start=n
+
+set compiler_dir=%DARK_CDIR%
+
+$D{port}
+
+set DIANJIA_HOME=%DIANJIA_HOME%
+
+set TOMCAT_HOME=%DIANJIA_HOME%\temp_tomcat\%port_num%
+
+set JAVA_HOME=%DIANJIA_HOME%\jdk
+
+set MAVEN_HOME=%DIANJIA_HOME%\maven3
+
+set CATALINA_HOME=%TOMCAT_HOME%
+
+set PATH=%MAVEN_HOME%\bin;%PATH%
+
+set PATH=%JAVA_HOME%\bin;%PATH%
+
+
+:LOOP  
+    set index=%1
+
+    if x%index% == x goto END  
+    
+    if %index% == init (
+			
+		npm config set registry http://nexus3.dianjia.io/repository/npm-group/
+		npm install yarn -g
+		echo ******** 设置npm私服 ********
+		
+		mkdir "%DIANJIA_HOME%\temp_tomcat\%port_num%"
+
+		xcopy /y /e "%DIANJIA_HOME%\tomcat8" "%DIANJIA_HOME%\temp_tomcat\%port_num%"
+
+		copy server.xml %DIANJIA_HOME%\temp_tomcat\%port_num%\conf\
+		echo ******** 设置创建私有tomcat成功 ********
+		cd Web
+		echo ******** 安装yarn中 ********
+		yarn install
+		echo ******** 安装yarn成功 ********
+		cd ../
+	    goto EXITEND
+	)
+	
+	if %index% == clean (
+		rd /s /q WebRoot
+		rd /s /q %DIANJIA_HOME%\repository\com\amugua
+		echo ******** Dirtory WebRoot clean successful!!!!. ********
+		echo ******** Dirtory %DIANJIA_HOME%\repository\com\amugua clean successful!!!!. ********
+	    goto EXITEND
+	)
+
+	if %index% == djmodules (
+		setlocal EnableDelayedExpansion
+		echo ******** Reload DJModules. ********
+		cd Web 
+		yarn upgrade djmodules djmodules-utils
+		cd ../
+	    goto EXITEND
+	)
+
+	if %index% == gitpull (
+			
+    	set home=%cd%
+		cd ../
+		echo ******** 执行git更新 ********
+		git pull
+		cd %home%
+	    goto EXITEND
+	)
+
+	if %index% == pos (
+		cd Web/oldweb
+		call yarn install
+		cd views/modules/cashier/store-order-dev
+		rd /s /q "../store-order"
+		call fis3 release -d "../store-order"
+		cd ../../../../
+		call gulp prod
+		cd ../../
+		goto EXITEND
+	)
+	if %index% == buildDll (
+		cd Web
+		echo ******** 开始执行命令:dihog buildDll ********
+		dihog buildDll
+		cd ../
+		goto EXITEND
+	)
+	if %index% == dev (
+		cd Web
+		echo ******** 开始执行命令:dihog build -w --debug --dir %compiler_dir% ********
+		dihog buildDll
+		call dihog build -w --debug --dir %compiler_dir%
+		cd ../
+		goto EXITEND
+	)
+
+	if %index% == prod (
+		cd Web
+		echo ******** 开始执行命令:dihog build --dir %compiler_dir% ********
+		dihog buildDll
+		dihog build --zip --dir %compiler_dir%
+		cd ../
+		goto EXITEND
+	)
+
+	if %index% == mvn (
+		set opt_mvn=y
+		goto NEXT
+	)
+
+	if %index% == yarn (
+		cd Web
+		yarn install
+		goto EXITEND
+	)
+
+	if %index% == start (
+		set opt_start=y
+		set HOT_DICTORY=%cd%/WebRoot
+		goto NEXT
+	)
+	
+	if %index% == stop (
+		if x%TOMCAT_HOME% == x (
+			echo "TOMCAT_HOME is not be setted, skip stop tomcat."
+		) else (
+			call %TOMCAT_HOME%\bin\shutdown.bat
+		)
+		echo 'Stop successful !!!!!.'
+		goto EXITEND
+	)
+
+	if %index% == tomcat_home (
+		set TOMCAT_HOME=%index%
+		goto NEXT
+	)
+
+	if %index% == TOMCAT_HOME (
+		set TOMCAT_HOME=%index%
+		goto NEXT
+	)
+
+	set opt_config=%index%
+	goto NEXT
+ :NEXT
+    shift  
+    goto LOOP
+:END
+
+if not x%opt_config% == x (
+	set DEFAULT_CONFIG=%opt_config%
+	echo ******** DEFAULT_CONFIG=%opt_config% ********
+)
+
+if %opt_mvn% == n  (
+	echo ******** Mvn build will not be doing. ********
+) else (
+	echo ******** Mvn build will be doing. ********
+)
+
+if %opt_start%==n ( 
+	echo ******** Tomcat will not be starting. ********
+) else (
+	echo ******** Tomcat will be starting. ********
+	echo ******** TOMCAT_HOME=%TOMCAT_HOME%. ********
+)
+
+echo ******** Start doing batch ********
+
+@echo on
+call cd Web
+
+echo ******** Start roadhog ********
+
+@echo off
+
+cd ..
+
+if %opt_mvn% == n (
+	echo skip mvn build
+)else (
+	echo ******** Start maven build ********
+	call mvn clean install
+)
+
+if %opt_start% == y (
+	if x%DIANJIA_HOME%==x (
+		echo "Please set DIANJIA_HOME"
+	) else (
+		echo ******** Start Tomcat ********
+		set tomcat_home = %TOMCAT_HOME%
+		call %tomcat_home%\bin\startup.bat
+	)
+) else (
+    echo ******** Skip Start Tomcat ********
+)
+
+:EXITEND

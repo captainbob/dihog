@@ -1,0 +1,182 @@
+opt_config="default"
+opt_mvn="n"
+opt_start="n"
+$D{port}
+
+compiler_dir="${DARK_CDIR}"
+
+export CATALINA_OPTS="-server -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=85${port_num}" 
+
+DIANJIA_HOME="$DIANJIA_HOME"
+
+TOMCAT_HOME="${DIANJIA_HOME}/temp_tomcat/${port_num}"
+
+export TOMCAT_HOME="${TOMCAT_HOME}"
+
+export JAVA_HOME="$DIANJIA_HOME/jdk"
+
+export MAVEN_HOME="$DIANJIA_HOME/maven3"
+
+export CATALINA_HOME="$TOMCAT_HOME"
+
+export PATH="${MAVEN_HOME}/bin:${PATH}"
+export PATH="${JAVA_HOME}/bin:${PATH}"
+
+HOT_DICTORY="$(cd `dirname $0`; pwd)/WebRoot"
+
+for arg in $@
+ do
+ 	opt_key=${arg%=*}
+ 	opt_value=${arg#*=}
+ 	case $opt_key in
+ 		init)
+ 			npm config set registry http://nexus3.dianjia.io/repository/npm-group/
+			npm install yarn -g
+ 			echo "******** 设置npm私服 ********"
+ 			
+ 			mkdir -p ${DIANJIA_HOME}/temp_tomcat/${port_num}
+ 			cp -f -r ${DIANJIA_HOME}/tomcat8/* ${DIANJIA_HOME}/temp_tomcat/${port_num}/
+			#sed -e 's#docBase_val#'$(pwd)/WebRoot'#g' server.xml>server1.xml
+			#sed -e 's#port_num#'$port_num'#g' server1.xml>server2.xml
+			#mv server1.xml $TOMCAT_HOME/conf/server.xml
+			#mv server2.xml $TOMCAT_HOME/conf/server.xml
+
+			cp -f -r server.xml ${DIANJIA_HOME}/temp_tomcat/${port_num}/conf/
+			
+			echo "******** 设置创建私有tomcat成功 ********"
+			cd Web
+			echo "******** 安装yarn中 ********"
+			yarn install
+			echo "******** 安装yarn成功 ********"
+			cd ../
+			exit
+			;;
+		gitpull)
+			echo "******** 执行git更新 ********"
+ 			opt_dir="$(cd `dirname $0`; pwd)"
+			cd ../
+			git pull
+			cd $opt_dir
+			exit
+			;;
+		clean)
+			rm -rf WebRoot
+			rm -rf $DIANJIA_HOME/repository/com/amugua
+			echo "******** Remove Dir files WebRoot ********"
+			echo "******** Remove jar files $DIANJIA_HOME/repository/com/amugua ********"
+			exit
+			;;
+		djmodules)
+			cd Web
+			yarn upgrade djmodules djmodules-utils
+			cd ../
+			echo "******** Reload DJModules ********"
+			exit
+			;;
+		pos)
+			cd Web/oldweb
+			yarn install
+			cd views/modules/cashier/store-order-dev
+			rm -rf ../store-order
+			fis3 release -d ../store-order
+			cd ../../../../
+			gulp prod
+			cd ../../
+			exit
+			;;
+		buildDll)
+		    cd Web
+			echo "******** 开始执行命令:dihog buildDll ********"
+			dihog buildDll
+			cd ../
+			exit
+		    ;;
+		dev)
+		    cd Web
+			echo "******** 开始执行命令:dihog build -w --debug --dir ${compiler_dir} ********"
+			dihog buildDll
+			dihog build -w --debug --dir ${compiler_dir}
+			cd ../
+			exit
+		    ;;
+		prod)
+		    cd Web
+			echo "******** 开始执行命令:dihog build --dir ${compiler_dir} ********"
+			dihog buildDll
+			dihog build --zip --dir ${compiler_dir}
+			cd ../
+			exit
+		    ;;
+		mvn)
+		    opt_mvn="y"
+		    ;;
+		yarn)
+		 	cd Web
+			echo "******** 开始执行命令:dihog build --dir ${compiler_dir} ********"
+			yarn install
+			cd ../
+		    ;;
+		start)
+		    opt_start="y"
+		    export HOT_DICTORY = "$HOT_DICTORY"
+		    ;;
+		stop)
+		    kill $(ps aux|grep roadhog|awk '{print $2}')
+			if [[ $TOMCAT_HOME ]]; then
+				bash $TOMCAT_HOME/bin/shutdown.sh
+			else
+				echo 'TOMCAT_HOME is not be setted, skip stop tomcat.'
+			fi
+			echo 'Stop successful !!!!!.'
+			exit 0
+		    ;;
+		*)
+			opt_config="$opt_value"
+		   	;;
+	esac
+done
+
+if [ "$opt_mvn" == "n"  ]; then 
+	echo "******** Mvn build will not be doing. ********"
+else
+	echo "******** Mvn build will be doing. ********"
+fi
+
+if [ "$opt_start" == "n" ]; then 
+	echo "******** Tomcat will not be starting. ********"
+else
+	echo "******** Tomcat will be starting. ********"
+	echo "******** TOMCAT_HOME=$TOMCAT_HOME. ********"
+fi
+
+if [ "$opt_config" != "" ]; then 
+	export DEFAULT_CONFIG=$opt_config
+	echo "******** DEFAULT_CONFIG=$opt_config ********"
+fi
+
+echo "==================Start doing batch================="
+
+cd Web
+
+cd ../
+
+if [ "$opt_mvn" != "n" ]; then
+	echo "******** Start Maven build. ********"
+	mvn clean install
+else
+	echo "******** Skip Maven build. ********"
+fi
+
+
+if [ "$opt_start" != "n" ]; then 
+	if [ $TOMCAT_HOME ]; then
+		echo "******** Start Tomcat. ********"
+		echo "Using HOT_DICTORY:	$HOT_DICTORY" 
+		bash $TOMCAT_HOME/bin/startup.sh
+		tail -f $TOMCAT_HOME/logs/catalina.out 
+	else
+		echo 'Please set TOMCAT_HOME'
+	fi
+else
+	echo "******** Skip start Tomcat. ********"
+fi

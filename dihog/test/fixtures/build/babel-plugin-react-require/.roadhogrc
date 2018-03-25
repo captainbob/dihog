@@ -1,0 +1,6 @@
+{
+  "devtool": "",
+  "externals": {
+    "react": "window.React"
+  }
+}

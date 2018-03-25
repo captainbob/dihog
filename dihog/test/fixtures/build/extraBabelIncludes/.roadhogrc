@@ -1,0 +1,6 @@
+{
+  "devtool": "",
+  "extraBabelIncludes": [
+    "./node_modules/a"
+  ]
+}
