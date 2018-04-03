@@ -1,6 +1,5 @@
 import webpack from 'webpack';
 import { join } from 'path';
-
 import pullAll from 'lodash.pullall';
 import uniq from 'lodash.uniq';
 
@@ -16,7 +15,7 @@ export default function (argv, rcConfig, paths) {
   const dependencies = pullAll(includeDependencies, exclude);
 
   const alias = dependencies.reduce((total, current) => {
-    total[current] = join(paths.appNodeModules, current)
+    total[current] = join(paths.appNodeModules, current);
     return total;
   }, {});
 
@@ -32,8 +31,8 @@ export default function (argv, rcConfig, paths) {
     plugins: [
       new webpack.DefinePlugin({
         'process.env': {
-          NODE_ENV: JSON.stringify('production')
-        }
+          NODE_ENV: JSON.stringify('production'),
+        },
       }),
       new webpack.optimize.UglifyJsPlugin({
         compress: {
@@ -55,8 +54,6 @@ export default function (argv, rcConfig, paths) {
         context: paths.appSrc,
       }),
     ],
-    resolve: {
-      alias: alias
-    },
+    resolve: { alias },
   };
 }

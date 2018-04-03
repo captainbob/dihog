@@ -1,8 +1,10 @@
-const { resolve } = require('path');
 import { existsSync, readFileSync, realpathSync } from 'fs';
 import stripJsonComments from 'strip-json-comments';
-import { DIHOG_CONFIG_JSON_FILE } from './globalConfig';
 import parseJSON from 'parse-json-pretty';
+import { resolve } from 'path';
+import { DIHOG_CONFIG_JSON_FILE } from './globalConfig';
+
+// const { resolve } = require('path');
 
 function resolveOwn(relativePath) {
   return resolve(__dirname, relativePath);
@@ -45,8 +47,8 @@ export default function getPaths(cwd) {
   const appPublic = rcConfig.appPublic || 'public';
   const appBuild = getOutputPath(rcConfig) || 'dist';
 
-  const dllNodeModule = (appPublic || appNodeModules) + '/dihog-dlls';
-  const dllManifest = (appPublic || appNodeModules) + '/dihog-dlls/dihog-manifest.json';
+  const dllNodeModule = `${appPublic || appNodeModules}/dihog-dlls`;
+  const dllManifest = `${appPublic || appNodeModules}/dihog-dlls/dihog-manifest.json`;
 
   function resolveApp(relativePath) {
     return _resolveApp(appDirectory, relativePath);
@@ -61,7 +63,7 @@ export default function getPaths(cwd) {
     ownNodeModules: resolveOwn('../../node_modules'),
     dllNodeModule: resolveApp(dllNodeModule),
     dllManifest: resolveApp(dllManifest),
-    appBabelCache: resolveApp(appNodeModules + '/.cache/babel-loader'),
+    appBabelCache: resolveApp(`${appNodeModules}/.cache/babel-loader`),
     resolveApp,
     appDirectory,
   };

@@ -1,6 +1,6 @@
 {
   "name": "dihog",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Cli tool for serve and build react app, based on create-react-app, support JSON pattern config.",
   "bin": {
     "dihog": "./bin/dihog.js"
@@ -115,5 +115,10 @@
     "postcss-pxtorem": "^4.0.0",
     "sass-loader": "^6.0.6",
     "uglifyjs-webpack-plugin": "^0.4.6"
-  }
+  },
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "author": "yezi,ziteng"
 }

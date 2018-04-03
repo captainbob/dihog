@@ -1,17 +1,17 @@
 import chalk from 'chalk';
-import cluster from 'cluster';
+// import cluster from 'cluster';
 import fs from 'fs-extra';
 import path from 'path';
 import filesize from 'filesize';
 import { sync as gzipSize } from 'gzip-size';
 import webpack from 'webpack';
-import recursive from 'recursive-readdir';
+// import recursive from 'recursive-readdir';
 import stripAnsi from 'strip-ansi';
 import getPaths from './config/paths';
 import getConfig from './utils/getConfig';
 import runArray from './utils/runArray';
 import applyWebpackConfig, { warnIfExists } from './utils/applyWebpackConfig';
-import copyDirSync from './utils/copy-dir';
+// import copyDirSync from './utils/copy-dir';
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 
@@ -45,8 +45,8 @@ const argv = require('yargs')
 let rcConfig;
 let outputPath;
 let appBuild;
-let appStatic;
 let config;
+// let appStatic;
 
 function getOutputPath(rcConfig) {
   if (Array.isArray(rcConfig)) {
@@ -160,15 +160,12 @@ function doneHandler(argv, err, stats) {
 function realBuild(argv) {
   if (argv.debug) {
     console.log('Creating an development build without compress...');
+  } else if (argv.zip) {
+    console.log('Creating an optimized production build with compress...');
   } else {
-    if (argv.zip) {
-      console.log('Creating an optimized production build with compress...');
-    } else {
-      console.log('Creating an optimized production build without compress...');
-    }
+    console.log('Creating an optimized production build without compress...');
   }
 
-  const entry = config.entry;
   const done = doneHandler.bind(null, argv);
 
   const compiler = webpack(config);
@@ -178,6 +175,7 @@ function realBuild(argv) {
     compiler.run(done);
   }
 
+  // const entry = config.entry;
   // if (Object.keys(entry).length <= 1 || argv.watch) {
   //   const compiler = webpack(config);
   //   if (argv.watch) {
@@ -229,7 +227,7 @@ function realBuild(argv) {
   // }
 }
 
-let isFileCopied = false;
+// let isFileCopied = false;
 
 export function build(argv) {
   const paths = getPaths(argv.cwd);
@@ -245,7 +243,7 @@ export function build(argv) {
 
   outputPath = argv.outputPath || getOutputPath(rcConfig) || 'dist';
   appBuild = paths.resolveApp(outputPath);
-  appStatic = paths.appStatic;
+  // appStatic = paths.appStatic;
 
   config = runArray(rcConfig, (c) => {
     return applyWebpackConfig(

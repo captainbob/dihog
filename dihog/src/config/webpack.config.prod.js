@@ -1,13 +1,13 @@
 import webpack from 'webpack';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 // import Visualizer from 'webpack-visualizer-plugin';
+import { join } from 'path';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
+import UglifyJSPlugin from 'uglifyjs-webpack-plugin';
 import getEntry from '../utils/getEntry';
 import getTheme from '../utils/getTheme';
-import { join } from 'path';
 import getCSSLoaders from '../utils/getCSSLoaders';
 import addExtraBabelIncludes from '../utils/addExtraBabelIncludes';
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 import {
   getBabelOptions,
   baseSvgLoader,
@@ -23,7 +23,12 @@ import {
 import ExportsPlugin from '../webpack-plugins/exports-plugin';
 
 export default function (args, appBuild, config, paths) {
-  const { watch, debug, analyze, zip } = args;
+  const {
+    watch,
+    debug,
+    // analyze,
+    zip,
+  } = args;
   const NODE_ENV = debug ? 'development' : process.env.NODE_ENV;
 
   const {
@@ -108,7 +113,7 @@ export default function (args, appBuild, config, paths) {
             screw_ie8: true,
             ascii_only: true,
           },
-        }
+        },
       })] : [])),
       // ...(analyze ? [new Visualizer()] : []),
     ],

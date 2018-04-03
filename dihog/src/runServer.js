@@ -15,9 +15,10 @@ import getConfig from './utils/getConfig';
 import runArray from './utils/runArray';
 import applyWebpackConfig, { warnIfExists } from './utils/applyWebpackConfig';
 import { applyMock, outputError as outputMockError } from './utils/mock';
-import { DIHOG_CONFIG_JSON_FILE, DIHOG_MOCK_FILE } from './config/globalConfig';
+import { DIHOG_CONFIG_JSON_FILE } from './config/globalConfig';
+
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-process.noDeprecation = true
+process.noDeprecation = true;
 
 const DEFAULT_PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 8000;
 const isInteractive = process.stdout.isTTY;
@@ -25,7 +26,7 @@ const cwd = process.cwd();
 const paths = getPaths(cwd);
 let compiler;
 
-require('yargs') // eslint-disable-line
+const argv = require('yargs') // eslint-disable-line
   .usage('Usage: dihog server [options]')
   .help('h')
   .argv;
@@ -39,9 +40,9 @@ function clearConsoleWrapped() {
   }
 }
 
-function readRcConfig() {
+function readRcConfig(argv) {
   try {
-    rcConfig = getConfig(process.env.NODE_ENV, cwd);
+    rcConfig = getConfig(process.env.NODE_ENV, cwd, argv.dir);
   } catch (e) {
     console.log(chalk.red('Failed to parse dihog.json config.'));
     console.log();
@@ -167,7 +168,7 @@ function runDevServer(host, port, protocol) {
     publicPath: getPublicPath(),
     quiet: true,
     watchOptions: {
-      ignored: "/**/node_modules/!(djmodules)/**",
+      ignored: '/**/node_modules/!(djmodules)/**',
     },
     https: protocol === 'https',
     host,
@@ -225,8 +226,8 @@ function run(port) {
   runDevServer(host, port, protocol);
 }
 
-function init() {
-  readRcConfig();
+function init(argv) {
+  readRcConfig(argv);
 
   if (rcConfig.dllPlugin && !fs.existsSync(paths.dllManifest)) {
     console.log(chalk.red('Failed to start the server, since you have enabled dllPlugin, but have not run `dihog buildDll` before `dihog server`.'));
@@ -249,4 +250,4 @@ function init() {
   });
 }
 
-init();
+init(argv);

@@ -1,4 +1,7 @@
-import { basename, sep } from 'path';
+import {
+  // basename,
+  sep,
+} from 'path';
 import assert from 'assert';
 import glob from 'glob';
 import isPlainObject from 'is-plain-object';
@@ -6,8 +9,8 @@ import isPlainObject from 'is-plain-object';
 const DEFAULT_ENTRY = './src/index.js';
 
 function getEntry(filePath, isBuild) {
-  //const key = basename(filePath).replace(/\.(js|tsx?)$/, '');
-  //keep path
+  // const key = basename(filePath).replace(/\.(js|tsx?)$/, '');
+  // keep path
   const key = filePath.replace(/\.(js|tsx?)$/, '');
   const value = isBuild
     ? [filePath]

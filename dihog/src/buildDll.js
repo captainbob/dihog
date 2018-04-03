@@ -22,13 +22,13 @@ let rcConfig;
 let appBuild;
 let config;
 
-function deleteFiles(appBuild, fileNames) {
-  fileNames.forEach(function (filename) {
-    if (!(filename.startsWith(appBuild + '/META-INF') || filename.startsWith(appBuild + '/WEB-INF'))) {
-      fs.removeSync(filename);
-    }
-  });
-}
+// function deleteFiles(appBuild, fileNames) {
+//   fileNames.forEach(function (filename) {
+//      if (!(filename.startsWith(appBuild + '/META-INF') || filename.startsWith(appBuild + '/WEB-INF'))) {
+//       fs.removeSync(filename);
+//     }
+//   });
+// }
 
 
 export function build(argv) {
@@ -72,8 +72,8 @@ export function build(argv) {
 
       // Remove all content but keep the directory so that
       // if you're in it, you don't end up in Trash
-      //fs.emptyDirSync(appBuild);
-      //deleteFiles(appBuild, fileNames || []);
+      // fs.emptyDirSync(appBuild);
+      // deleteFiles(appBuild, fileNames || []);
 
       // Start the webpack build
       realBuild(previousSizeMap, resolve, argv);
