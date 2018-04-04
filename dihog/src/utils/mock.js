@@ -8,7 +8,8 @@ import { join } from 'path';
 import bodyParser from 'body-parser';
 import getPaths from '../config/paths';
 import winPath from './winPath';
-import { DIHOG_CONFIG_JSON_FILE, DIHOG_MOCK_FILE } from '../config/globalConfig';
+import { DIHOG_MOCK_FILE } from '../config/globalConfig';
+
 let error = null;
 const CONFIG_FILE = `${DIHOG_MOCK_FILE}.js`;
 const paths = getPaths(process.cwd());

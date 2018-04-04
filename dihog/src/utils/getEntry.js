@@ -54,7 +54,6 @@ export default function (config, appDirectory, isBuild) {
     if (isBuild) {
       return entry;
     }
-
     return Object.keys(entry).reduce((memo, key) => (!Array.isArray(entry[key]) ? ({
       ...memo,
       [key]: [
