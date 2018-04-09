@@ -69,6 +69,8 @@ export default function (args, appBuild, config, paths) {
     ]),
   ] : [];
 
+  config.entry = getEntry(config, paths.appDirectory, /* isBuild */true);
+
   const finalWebpackConfig = {
     bail: true,
     devtool,

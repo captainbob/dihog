@@ -3,7 +3,8 @@ import stripJsonComments from 'strip-json-comments';
 import isPlainObject from 'is-plain-object';
 import parseJSON from 'parse-json-pretty';
 import getPaths from '../config/paths';
-import { DIHOG_CONFIG_JSON_FILE, DIHOG_MOCK_FILE } from '../config/globalConfig';
+import { DIHOG_CONFIG_JSON_FILE } from '../config/globalConfig';
+
 require('./registerBabel');
 
 function merge(oldObj, newObj) {
@@ -65,7 +66,7 @@ function replaceDir(config, dir) {
     entry = [entry];
   }
 
-  entry = entry.map(function (item) {
+  entry = entry.map((item) => {
     return item.replace('${dir}', dir);
   });
 
@@ -75,6 +76,8 @@ function replaceDir(config, dir) {
 export function realGetConfig(configFile, env, pkg = {}, paths, dir) {
   env = env || 'development';
   const config = replaceDir(getConfig(configFile, paths), dir);
+  config.packageVersion = pkg.version;
+
   if (Array.isArray(config)) {
     return config.map((c) => {
       return mergeConfig(c, env, pkg);

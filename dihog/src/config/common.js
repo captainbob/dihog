@@ -1,12 +1,15 @@
 import webpack from 'webpack';
 import autoprefixer from 'autoprefixer';
 import { existsSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import normalizeDefine from '../utils/normalizeDefine';
 import winPath from '../utils/winPath';
+import getPaths from './paths';
+
+const myPaths = getPaths(process.cwd());
 
 export function getBabelOptions(config) {
   return {
@@ -40,6 +43,16 @@ export const spriteSvgLoader = {
 
 export const defaultDevtool = '#cheap-module-eval-source-map';
 
+function getAliasPath(alias = {}) {
+  const newAlias = {};
+  for (const item in alias) {
+    if (Object.prototype.hasOwnProperty.call(alias, item)) {
+      newAlias[item] = myPaths.resolveApp(alias[item]);
+    }
+  }
+  return newAlias;
+}
+
 export function getResolve(config, paths) {
   return {
     resolve: {
@@ -53,6 +66,7 @@ export function getResolve(config, paths) {
         '.web.js', '.web.jsx', '.web.ts', '.web.tsx',
         '.js', '.json', '.jsx', '.ts', '.tsx',
       ],
+      alias: getAliasPath(config.resolveAlias),
     },
     resolveLoader: {
       modules: [
@@ -131,7 +145,6 @@ export function getCSSRules(env, { config, paths, cssLoaders, theme }) {
   function includeTest(root, modulePath) {
     return modulePath.indexOf(root) > -1 && !isExclude(modulePath);
   }
-
   let rules = [
     {
       test: /\.css$/,
@@ -276,8 +289,25 @@ export const node = {
   tls: 'empty',
 };
 
+function getMultiPageHtml({ entry, packageVersion }) {
+  const htmlPluginList = [];
+  for (const key in entry) {
+    if (Object.prototype.hasOwnProperty.call(entry, key)) {
+      const beforePath = dirname(key);
+      htmlPluginList.push(new HtmlWebpackPlugin({
+        filename: `${beforePath}/index.html`,
+        template: `${beforePath}/index.ejs`,
+        chunks: [`${beforePath}/index`],
+        inject: false,
+        packageVersion,
+      }));
+    }
+  }
+  return htmlPluginList;
+}
+
 export function getCommonPlugins({ config, paths, appBuild, NODE_ENV }) {
-  const ret = [];
+  let ret = [];
 
   let defineObj = {
     'process.env': {
@@ -291,11 +321,17 @@ export function getCommonPlugins({ config, paths, appBuild, NODE_ENV }) {
     };
   }
   ret.push(new webpack.DefinePlugin(defineObj));
-
-  if (existsSync(join(paths.appSrc, 'index.ejs'))) {
+  // 如果没有多页面html标识时，去通用html入口
+  if (config.multipagehtml) {
+    ret = ret.concat(getMultiPageHtml({
+      entry: config.entry,
+      packageVersion: config.packageVersion,
+    }));
+  } else if (existsSync(join(paths.appSrc, 'index.ejs'))) {
     ret.push(new HtmlWebpackPlugin({
       template: 'src/index.ejs',
       inject: true,
+      packageVersion: config.packageVersion,
     }));
   }
 

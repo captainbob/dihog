@@ -32,6 +32,7 @@ switch (script) {
   case '--version':
     console.log(require('../package.json').version);
     break;
+  case 'create':
   case 'build':
   case 'buildDll':
   case 'server':

@@ -153,7 +153,8 @@ export default {
   "externals": null,
   "library": null,
   "libraryTarget": "var",
-  "multipage": false,
+  "multipage": false, // 单页应用的多页分离
+  "htmlTempPath":"",  // 多页应用的路径
   "define": null,
   "env": null,
   "theme": null,
