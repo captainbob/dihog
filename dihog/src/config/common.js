@@ -289,7 +289,7 @@ export const node = {
   tls: 'empty',
 };
 
-function getMultiPageHtml({ entry, packageVersion }) {
+function getMultiPageHtml({ entry, packageVersion, NODE_ENV }) {
   const htmlPluginList = [];
   for (const key in entry) {
     if (Object.prototype.hasOwnProperty.call(entry, key)) {
@@ -300,6 +300,7 @@ function getMultiPageHtml({ entry, packageVersion }) {
         chunks: [`${beforePath}/index`],
         inject: false,
         packageVersion,
+        nodeEnv: NODE_ENV,
       }));
     }
   }
@@ -326,12 +327,14 @@ export function getCommonPlugins({ config, paths, appBuild, NODE_ENV }) {
     ret = ret.concat(getMultiPageHtml({
       entry: config.entry,
       packageVersion: config.packageVersion,
+      NODE_ENV,
     }));
   } else if (existsSync(join(paths.appSrc, 'index.ejs'))) {
     ret.push(new HtmlWebpackPlugin({
       template: 'src/index.ejs',
       inject: true,
       packageVersion: config.packageVersion,
+      nodeEnv: JSON.stringify(NODE_ENV),
     }));
   }
 
