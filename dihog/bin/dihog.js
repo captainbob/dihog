@@ -37,6 +37,7 @@ switch (script) {
   case 'buildDll':
   case 'server':
   case 'test':
+  case 'jest-test':
     require('atool-monitor').emit();
     result = spawn.sync(
       'node',

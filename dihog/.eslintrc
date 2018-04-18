@@ -1,11 +1,16 @@
 {
   "parser": "babel-eslint",
-  "extends": "airbnb",
+  "extends": [
+    "airbnb",
+    "prettier"
+  ],
   "env": {
     "mocha": true
   },
   "rules": {
-    // "no-console": [0],
+    "no-console": [
+      1
+    ],
     "generator-star-spacing": [
       0
     ],
