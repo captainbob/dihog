@@ -1,6 +1,6 @@
 {
   "name": "dihog",
-  "version": "1.1.4",
+  "version": "1.1.6",
   "description": "Cli tool for serve and build react app, based on create-react-app, support JSON pattern config.",
   "bin": {
     "dihog": "./bin/dihog.js"
@@ -13,11 +13,11 @@
     "webpack"
   ],
   "authors": [
-    "chencheng <sorrycc@gmail.com> (https://github.com/sorrycc)"
+    "yezi"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/sorrycc/dihog/issues"
+    "url": "https://github.com/captainbob/dihog/issues"
   },
   "files": [
     "bin",
@@ -50,6 +50,7 @@
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-react-require": "^3.0.0",
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
+    "babel-preset-react-app": "^3.1.1",
     "babel-polyfill": "^6.20.0",
     "babel-preset-es2015": "^6.18.0",
     "babel-preset-react": "^6.11.1",
@@ -105,7 +106,6 @@
     "babel-cli": "^6.14.0",
     "babel-eslint": "^7.2.1",
     "babel-jest": "^22.4.3",
-    "babel-preset-react-app": "^3.1.1",
     "cross-env": "^5.0.4",
     "eslint-config-airbnb": "^15.0.1",
     "eslint-config-prettier": "^2.9.0",
